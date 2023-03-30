@@ -25,6 +25,7 @@ end
 
 if (RETIME)
     landing_pix_index = -1;
+    begin_pix_index = -1;
 end
 
 %% get landing frame number from watching the video
@@ -76,7 +77,7 @@ if ( ~exist('landing_pix_index','var') || landing_pix_index < 0 )
     
 end
 
-if ( ~exist('begin_pix_index','var') )
+if ( ~exist('begin_pix_index','var') || begin_pix_index < 0 )
     
     figure
     plot(1:length(lpos.z),lpos.z,1:length(acc),acc)
@@ -119,7 +120,7 @@ if ( ~exist('throttle_pix_index','var') || throttle_pix_index < 0 )
 end
 
 %% create time vector of time instants of video frames
-time = cdata.Gyro.Time;
+time = seconds(cdata.Gyro.Time);
 FRAMERATE = vid.FrameRate;
 dt = 1/FRAMERATE; % time period between frames
 tland = time(landing_pix_index):-dt:time(begin_pix_index);
@@ -130,7 +131,7 @@ t = flip(t)';
 % init time for ESC
 t_esc = zeros(length(ESC_throttle.Throttle),1);
 % set notable sync time to correct value
-t_esc(throttle_esc_index) = seconds(time(throttle_pix_index));
+t_esc(throttle_esc_index) = time(throttle_pix_index);
 % construct time previously to notable instant
 for i=throttle_esc_index-1:-1:1
     t_esc(i) = t_esc(i+1) - ESC_DT;
@@ -250,12 +251,12 @@ end
 for n = 1:length(t)
     r2d = 180/pi;
     if (VIDEO_TEMPLATE_TYPE == 1)
-        addpoints(plot1,t(n),airspeedf(n))
+        addpoints(plot1,t(n),double(airspeedf(n)))
         addpoints(plot3,t(n),rc_rollf(n))
         addpoints(plot4,t(n),rc_yawf(n))
     end
     if (VIDEO_TEMPLATE_TYPE == 2)
-        addpoints(plot1,t(n),altf(n))
+        addpoints(plot1,t(n),double(altf(n)))
         addpoints(plot3,t(n),thrf(n))
         addpoints(plot3a,t(n),ESC_RPMf(n)/max(ESC_RPMf))
         addpoints(plot4,t(n),rc_pitchf(n))
@@ -270,9 +271,12 @@ for n = 1:length(t)
     M(n)=getframe(fig_anim);
 end
 
-video = VideoWriter(OUTPUT_VIDEO_FILE,'MPEG-4');
+video = VideoWriter(OUTPUT_VIDEO_FILE,'Uncompressed AVI');
 open(video)
-writeVideo(video,M)
+for k=1:length(M)
+    writeVideo(video,M(k));
+end
+%writeVideo(video,M)
 close(video)
 
 
