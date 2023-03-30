@@ -205,7 +205,7 @@ fig_anim = figure('Color','white','Position',[30 , 260 , 1500, 730]);
 Fsize = 18;
 
 %Embedded video
-subplot(2,2,2);
+subplot(3,3,[2 3 5 6]);
 frame_current = readFrame(vid);
 plot2 = imshow(frame_current,'Border','tight');
 
@@ -221,19 +221,25 @@ if (VIDEO_TEMPLATE_TYPE == 1)
     subplot(2,2,4);plot4 = animatedline('Color','b');xlim([t(1) t(length(t))]);ylim([min(rc_yawf) max(rc_yawf)])
     ylabel('RC Yaw','FontSize',Fsize,'Fontname','Source Sans Pro')
     set(gca,'FontSize',Fsize,'Fontname','Source Sans Pro')
-end
-if (VIDEO_TEMPLATE_TYPE == 2)
-    subplot(2,2,1);plot1 = animatedline('Color','b');xlim([t(1) t(length(t))]);ylim([min(altf) max(altf)])
+    subplot(3,3,1);plot1 = animatedline('Color','b');xlim([t(1) t(length(t))]);ylim([min(altf) max(altf)])
     ylabel('Altitude [m]','FontSize',Fsize,'Fontname','Source Sans Pro')
     set(gca,'FontSize',Fsize,'Fontname','Source Sans Pro')
-    subplot(2,2,3);plot3 = animatedline('Color','b');xlim([t(1) t(length(t))]);ylim([min(thrf) max(thrf)])
-    ylabel('Throttle/RPM','FontSize',Fsize,'Fontname','Source Sans Pro')
+end
+if (VIDEO_TEMPLATE_TYPE == 2)
+    subplot(3,3,4);plot1 = animatedline('Color','b');xlim([t(1) t(length(t))]);ylim([0 1])
+    ylabel('RPM [rad/s]','FontSize',Fsize,'Fontname','Source Sans Pro')
     set(gca,'FontSize',Fsize,'Fontname','Source Sans Pro')
-    subplot(2,2,3);plot3a = animatedline('Color','r');xlim([t(1) t(length(t))]);ylim([0 1])
-    ylabel('Throttle/RPM','FontSize',Fsize,'Fontname','Source Sans Pro')
+    subplot(3,3,1);plot3 = animatedline('Color','b');xlim([t(1) t(length(t))]);ylim([min(airspeedf) max(airspeedf)])
+    ylabel('Airspeed [m/s]','FontSize',Fsize,'Fontname','Source Sans Pro')
     set(gca,'FontSize',Fsize,'Fontname','Source Sans Pro')
-    subplot(2,2,4);plot4 = animatedline('Color','b');xlim([t(1) t(length(t))]);ylim([min(rc_pitchf) max(rc_pitchf)])
+    subplot(3,3,7);plot4 = animatedline('Color','b');xlim([t(1) t(length(t))]);ylim([min(thrf) max(thrf)])
+    ylabel('RC Throttle ','FontSize',Fsize,'Fontname','Source Sans Pro')
+    set(gca,'FontSize',Fsize,'Fontname','Source Sans Pro')
+    subplot(3,3,8);plot5 = animatedline('Color','b');xlim([t(1) t(length(t))]);ylim([min(rc_pitchf) max(rc_pitchf)])
     ylabel('RC Pitch','FontSize',Fsize,'Fontname','Source Sans Pro')
+    set(gca,'FontSize',Fsize,'Fontname','Source Sans Pro')
+    subplot(3,3,9);plot6 = animatedline('Color','r');xlim([t(1) t(length(t))]);ylim([min(pitchf) max(pitchf)])
+    ylabel('Pitch Rate [rad/s]','FontSize',Fsize,'Fontname','Source Sans Pro')
     set(gca,'FontSize',Fsize,'Fontname','Source Sans Pro')
 end
 
@@ -256,10 +262,11 @@ for n = 1:length(t)
         addpoints(plot4,t(n),rc_yawf(n))
     end
     if (VIDEO_TEMPLATE_TYPE == 2)
-        addpoints(plot1,t(n),double(altf(n)))
-        addpoints(plot3,t(n),thrf(n))
-        addpoints(plot3a,t(n),ESC_RPMf(n)/max(ESC_RPMf))
-        addpoints(plot4,t(n),rc_pitchf(n))
+        addpoints(plot1,t(n),ESC_RPMf(n)/max(ESC_RPMf)) %ESC_RPMf(n)/max(ESC_RPMf)
+        addpoints(plot3,t(n),double(airspeedf(n)))
+        addpoints(plot4,t(n),thrf(n))
+        addpoints(plot5,t(n),rc_pitchf(n))
+        addpoints(plot6,t(n),pitchf(n))
     end
     % Ground video
     if (hasFrame(vid))
